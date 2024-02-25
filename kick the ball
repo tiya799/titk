@@ -1,82 +1,78 @@
-import pygame
-import sys
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Game JavaScript</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+        #player {
+            position: absolute;
+            left: 50%;
+            bottom: 10px;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 20px;
+            background-color: black;
+        }
+        #ball {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div id="player"></div>
+    <div id="ball"></div>
 
-# Inisialisasi Pygame
-pygame.init()
+    <script>
+        const player = document.getElementById('player');
+        const ball = document.getElementById('ball');
+        let ballSpeed = 5;
+        let ballDirection = 1;
+        let playerPosition = 50;
 
-# Ukuran layar
-screen_width = 800
-screen_height = 600
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Tendang Bola Mini Game")
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft' && playerPosition > 0) {
+                playerPosition -= 10;
+                player.style.left = playerPosition + '%';
+            } else if (event.key === 'ArrowRight' && playerPosition < 100) {
+                playerPosition += 10;
+                player.style.left = playerPosition + '%';
+            }
+        });
 
-# Warna
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-BLUE = (0, 0, 255)
+        function moveBall() {
+            let ballTop = ball.offsetTop;
+            if (ballTop + ballSpeed * ballDirection < window.innerHeight - 20) {
+                ball.style.top = ballTop + ballSpeed * ballDirection + 'px';
+            } else {
+                if (ballTop + ballSpeed * ballDirection >= window.innerHeight - 20 && 
+                    ballTop + ballSpeed * ballDirection <= window.innerHeight) {
+                    if (ballTop + ballSpeed * ballDirection < window.innerHeight - 10) {
+                        ballDirection = -ballDirection;
+                    }
+                } else {
+                    ballDirection = -ballDirection;
+                }
+            }
+        }
 
-# Variabel pemain
-player_width = 100
-player_height = 20
-player_x = (screen_width - player_width) // 2
-player_y = screen_height - player_height - 10
+        function gameLoop() {
+            moveBall();
+            requestAnimationFrame(gameLoop);
+        }
 
-# Variabel bola
-ball_radius = 10
-ball_x = screen_width // 2
-ball_y = screen_height // 2
-ball_speed_x = 5
-ball_speed_y = 5
-
-# Fungsi untuk menggambar pemain dan bola
-def draw_objects():
-    screen.fill(WHITE)
-    pygame.draw.rect(screen, BLACK, (player_x, player_y, player_width, player_height))
-    pygame.draw.circle(screen, BLUE, (ball_x, ball_y), ball_radius)
-
-# Main game loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    
-    # Pergerakan pemain
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and player_x > 0:
-        player_x -= 5
-    if keys[pygame.K_RIGHT] and player_x < screen_width - player_width:
-        player_x += 5
-
-    # Pergerakan bola
-    ball_x += ball_speed_x
-    ball_y += ball_speed_y
-
-    # Deteksi tabrakan bola dengan tepi layar
-    if ball_x <= 0 or ball_x >= screen_width:
-        ball_speed_x = -ball_speed_x
-    if ball_y <= 0 or ball_y >= screen_height:
-        ball_speed_y = -ball_speed_y
-
-    # Deteksi tabrakan bola dengan pemain
-    if ball_y + ball_radius >= player_y and ball_x >= player_x and ball_x <= player_x + player_width:
-        ball_speed_y = -ball_speed_y
-
-    # Deteksi gol
-    if ball_y <= 0:
-        print("GOL!")
-        ball_x = screen_width // 2
-        ball_y = screen_height // 2
-
-    # Gambar objek
-    draw_objects()
-
-    # Update layar
-    pygame.display.update()
-
-    # FPS
-    pygame.time.Clock().tick(60)
-
-# Keluar dari Pygame
-pygame.quit()
-sys.exit()
+        gameLoop();
+    </script>
+</body>
+</html>
